@@ -11,9 +11,9 @@ First, make sure you have the [Polymer CLI](https://www.npmjs.com/package/polyme
 ```
 $ polymer serve --open
 ```
-![alt text](http://url/to/img.png)
-![alt text](http://url/to/img.png)
-![alt text](http://url/to/img.png)
+![Login Page](https://github.com/martincapo/polymer-login/blob/master/src/images/1.png)
+![Login with error](https://github.com/martincapo/polymer-login/blob/master/src/images/2.png)
+![Logged in](https://github.com/martincapo/polymer-login/blob/master/src/images/3.png)
 
 ## Running Tests
 

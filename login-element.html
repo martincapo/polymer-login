@@ -1,0 +1,149 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="./bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="login-element">
+  <template>
+    <iron-ajax
+      id="loginAjax"
+      method="post"
+      url="https://origin.thrinacia.com/api/service/restv1/authenticate"
+      content-type="application/json"
+      handle-as="text"
+      on-response="handleUserResponse"
+      on-error="handleUserError">
+    </iron-ajax>
+    <style>
+      :host {
+        display: block;
+      }
+      .container {
+        margin: auto;
+        max-width: 380px;
+        text-align: center;
+        border: solid 1px #C2C2C2;
+        border-radius: 5px;
+        font-size: 12px;
+      }
+      .login__title {
+        margin: 10px 0;
+        color: #509FE4;
+        font-size: 18px;
+      }
+      .error {
+        color: red;
+      }
+      label {
+        display: block;
+        font-size: 12px;
+        font-weight: bold;
+        text-align: left;
+        margin: 0 5% .3em;
+      }
+      input {
+        width: 80%;
+        height: 35px;
+        border: solid 1px #C2C2C2;
+        border-radius: 5px;
+        padding: 0 15px; 
+        margin-bottom: 10px; 
+      }
+      input::placeholder {
+        font-size: 12px;
+        color: #A3A3A3;
+      }
+      button {
+        width: 80%;
+        height: 35px;
+        background-color: #509FE4;
+        color: #FFFFFF;
+        border-radius: 3px;
+        border: solid 1px #468bc4;
+        font-size: 12px;
+        cursor: pointer;
+        margin: 20px 0;
+      }
+      button:hover {
+        background-color: #CDD8E0;
+        border: solid 1px #b4bdc4;
+      }
+    </style>
+    <div class="container">
+        <div class="login__title">Log in</div>
+        <div class="error">[[error]]</div>
+        <div>
+          <label for="email">Email</label>
+          <input type="text" class="form-control" name="email" on-change="onChange" placeholder="Email" required>
+        </div>
+        <div>
+          <label for="password">Password</label>
+          <input type="password" class="form-control" name="password" on-change="onChange" placeholder="Password">
+        </div>
+
+        <button type="submit" on-click="postLogin">Log in</button>
+    </div>
+  </template>
+
+  <script>
+    /**
+     * `login-element`
+     * 
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class LoginElement extends Polymer.Element {
+      static get is() { return 'login-element'; }
+      static get properties() {
+        return {
+          formData: {
+            email: String,
+            password: String
+          },
+          storedUser: Object,
+          error: String
+        };
+      }
+
+      postLogin() {
+        this.$.loginAjax.body = this.formData;
+        this.$.loginAjax.generateRequest();
+      }
+
+      onChange(e) {
+        const { name, value } = e.target;
+        this.formData = {...this.formData, [name]: value};
+        console.log(this.formData);
+      }
+
+      handleUserResponse(e) {
+        var res = JSON.parse(e.detail.response);
+        console.log(res.auth_token);
+        if (res.auth_token) {
+          localStorage.setItem('auth_token', res.auth_token);
+          this.storedUser = {
+            id: res.id,
+            last_name: res.last_name,
+            first_name: res.first_name,
+            email: res.email,
+            auth_token: res.auth_token,
+            loggedin: true
+          };
+          this.error = '';
+        }
+        // reset form data
+        this.formData = {};
+      }
+
+      handleUserError(e) {
+        const errors = JSON.parse(e.detail.request.xhr.response);
+        if(errors.errors.credential_verification[0].message) {
+          this.error = "Invalid email or password"
+        }
+      }
+
+    }
+
+    window.customElements.define(LoginElement.is, LoginElement);
+  </script>
+</dom-module>
